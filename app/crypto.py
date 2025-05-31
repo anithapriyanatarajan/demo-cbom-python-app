@@ -1,15 +1,17 @@
-# Insecure crypto.py
+# Secure crypto.py (secure branch)
 import hashlib
-from Crypto.Cipher import DES
-from Crypto.Util.Padding import pad, unpad
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+import os
 import base64
 
+key = AESGCM.generate_key(bit_length=128)
+
 def hash_password(pwd):
-    return hashlib.md5(pwd.encode()).hexdigest()  # ❌ Insecure hash
+    return hashlib.sha256(pwd.encode()).hexdigest()
 
 def encrypt_user_data(username, password):
-    key = b"12345678"  # ❌ Hardcoded weak key
-    cipher = DES.new(key, DES.MODE_ECB)  # ❌ ECB mode
+    aesgcm = AESGCM(key)
+    nonce = os.urandom(12)
     data = f"{username}:{password}".encode()
-    encrypted = cipher.encrypt(pad(data, 8))
-    return base64.b64encode(encrypted).decode()
+    ct = aesgcm.encrypt(nonce, data, None)
+    return base64.b64encode(nonce + ct).decode()
