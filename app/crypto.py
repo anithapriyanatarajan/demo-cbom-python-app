@@ -22,7 +22,7 @@ def hash_password(pwd):
     digest.update(pwd.encode())
     return digest.finalize().hex()
 
-def encrypt_user_data_secure(username, password):
+def encrypt_user_data(username, password):
     salt = os.urandom(16)  # Unique salt per encryption
     iv = os.urandom(12)    # 12 bytes for AES-GCM
     backend = default_backend()
